@@ -1,0 +1,41 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4194, 37.7749, 0]
+      },
+      "properties": {
+        "title": "Golden Gate Fog Watch",
+        "summary": "A marine layer rolled in just before sunset, creating a striking gradient over the bay.",
+        "articleHtml": "<p>The fog bank stretched across the span of the bridge, highlighting the silhouettes of the pylons. Sensors recorded a 12°C drop in temperature within 20 minutes.</p>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3522, 48.8566, 0]
+      },
+      "properties": {
+        "title": "Seine River Glow",
+        "summary": "Bioluminescent algae appeared in a narrow stretch of the Seine overnight.",
+        "articleUrl": "https://example.com/observations/seine-river-glow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.6917, 35.6895, 0]
+      },
+      "properties": {
+        "title": "Tokyo Rooftop Garden",
+        "summary": "Citizen scientists cataloged pollinator activity across seven rooftop habitats.",
+        "articleHtml": "<ul><li>Primary visitors: swallowtails, hoverflies, and honeybees.</li><li>Peak activity observed between 08:00-10:30.</li></ul>"
+      }
+    }
+  ]
+}
