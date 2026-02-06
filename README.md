@@ -28,6 +28,7 @@ token in `app.js` by setting `Cesium.Ion.defaultAccessToken`.
 - `styles.css`: Layout and visual styling.
 - `app.js`: Cesium viewer configuration and interaction logic.
 - `data/observations.geojson`: Observation feature data.
+- `PROMPTS.md`: Running log of prompts handled for this repository.
 
 ## Data format
 
