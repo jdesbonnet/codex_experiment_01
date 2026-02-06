@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Observation Explorer</title>
+    <title>Sentinel-2 GeoTIFF Timeline Explorer</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/cesium@1.119.0/Build/Cesium/Widgets/widgets.css"
@@ -13,41 +13,43 @@
   <body>
     <header class="app-header">
       <div>
-        <h1>Observation Explorer</h1>
-        <p>Click a pin to read the related observation article.</p>
+        <h1>Sentinel-2 GeoTIFF Timeline Explorer</h1>
+        <p>
+          Toggle between RGB and NDVI, then scrub the timeline to preview COG
+          products.
+        </p>
       </div>
       <div class="header-actions">
-        <span class="status" id="status">Loading map…</span>
-        <div class="tour-controls">
+        <div class="status" id="status">Loading imagery…</div>
+        <div class="control-row">
           <div class="control-group">
-            <label for="tourDuration">Observation time (sec)</label>
-            <input
-              id="tourDuration"
-              class="control-input"
-              type="number"
-              min="3"
-              max="30"
-              step="1"
-              value="8"
-            />
+            <span class="control-label">Render mode</span>
+            <div class="toggle-group" role="group" aria-label="Render mode">
+              <label class="toggle-option">
+                <input
+                  type="radio"
+                  name="renderMode"
+                  value="rgb"
+                  checked
+                />
+                <span>RGB</span>
+              </label>
+              <label class="toggle-option">
+                <input type="radio" name="renderMode" value="ndvi" />
+                <span>NDVI</span>
+              </label>
+            </div>
           </div>
-          <div class="control-group control-buttons">
-            <button class="primary-button" id="startTour">Start tour</button>
-            <button class="ghost-button" id="stopTour" disabled>Stop</button>
-          </div>
-          <div class="control-group control-buttons">
-            <button class="ghost-button" id="startRecording">Record</button>
-            <button class="ghost-button" id="stopRecording" disabled>
-              Stop recording
-            </button>
-            <a
-              class="text-link"
-              id="downloadRecording"
-              href="#"
-              download
-              hidden
-              >Download video</a
-            >
+          <div class="control-group">
+            <span class="control-label">Timeline zoom</span>
+            <div class="button-row">
+              <button class="ghost-button" id="zoomOut" type="button">
+                Zoom out
+              </button>
+              <button class="ghost-button" id="zoomIn" type="button">
+                Zoom in
+              </button>
+            </div>
           </div>
         </div>
         <a class="text-link" href="index.html">Change token</a>
@@ -55,11 +57,37 @@
     </header>
 
     <main class="app-shell">
-      <section id="cesiumContainer" class="map"></section>
-      <aside class="panel" id="articlePanel" aria-live="polite">
-        <h2 id="articleTitle">Select an observation</h2>
-        <div class="article-body" id="articleBody">
-          <p>Click a pin on the map to preview the observation article.</p>
+      <section id="cesiumContainer" class="map" aria-label="Cesium map"></section>
+      <aside class="panel" aria-live="polite">
+        <div class="panel-section">
+          <h2>Available products</h2>
+          <p class="panel-subtitle" id="productSummary">
+            Loading Sentinel-2 products…
+          </p>
+          <div class="product-list" id="productList"></div>
+        </div>
+        <div class="panel-section">
+          <h3>Selected product</h3>
+          <div class="product-detail" id="productDetail">
+            <p>Select a product on the timeline or list to load imagery.</p>
+          </div>
+        </div>
+        <div class="panel-section">
+          <h3>Tips</h3>
+          <ul class="tips-list">
+            <li>
+              COGs outside the AOI are treated as nodata and will render
+              transparent.
+            </li>
+            <li>
+              RGB imagery uses contrast and saturation tuning for better
+              visibility.
+            </li>
+            <li>
+              NDVI is computed from the red + NIR bands and colorized into a
+              vegetation ramp.
+            </li>
+          </ul>
         </div>
       </aside>
     </main>
