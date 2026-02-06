@@ -4,11 +4,6 @@ const statusEl = document.getElementById("status");
 const articleTitle = document.getElementById("articleTitle");
 const articleBody = document.getElementById("articleBody");
 const panel = document.getElementById("articlePanel");
-const tokenForm = document.getElementById("tokenForm");
-const tokenInput = document.getElementById("tokenInput");
-const tokenClear = document.getElementById("tokenClear");
-
-const TOKEN_STORAGE_KEY = "cesium.ion.token";
 
 let viewer;
 let handler;
@@ -18,14 +13,14 @@ const pinImage = pinBuilder
   .fromColor(Cesium.Color.fromCssColorString("#f36c3d"), 48)
   .toDataURL();
 
-const buildViewer = async (token) => {
-  if (!token) {
-    statusEl.textContent = "Enter a Cesium ion token to load terrain.";
-    return;
-  }
+const createImageryProvider = () =>
+  new Cesium.OpenStreetMapImageryProvider({
+    url: "https://a.tile.openstreetmap.org/",
+  });
 
-  statusEl.textContent = "Connecting to Cesium ion…";
-  Cesium.Ion.defaultAccessToken = token.trim();
+const buildViewer = async (token) => {
+  const trimmedToken = token?.trim();
+  const useToken = Boolean(trimmedToken);
 
   if (viewer) {
     viewer.destroy();
@@ -36,8 +31,18 @@ const buildViewer = async (token) => {
     handler = undefined;
   }
 
+  statusEl.textContent = useToken
+    ? "Connecting to Cesium ion…"
+    : "Loading map without a token…";
+
+  let terrainProvider;
   try {
-    const terrainProvider = await Cesium.createWorldTerrainAsync();
+    if (useToken) {
+      Cesium.Ion.defaultAccessToken = trimmedToken;
+      terrainProvider = await Cesium.createWorldTerrainAsync();
+    } else {
+      terrainProvider = new Cesium.EllipsoidTerrainProvider();
+    }
 
     viewer = new Cesium.Viewer("cesiumContainer", {
       animation: false,
@@ -49,6 +54,7 @@ const buildViewer = async (token) => {
       navigationHelpButton: false,
       fullscreenButton: false,
       terrainProvider,
+      imageryProvider: useToken ? undefined : createImageryProvider(),
     });
 
     viewer.scene.globe.enableLighting = true;
@@ -58,8 +64,9 @@ const buildViewer = async (token) => {
     await loadObservationPins();
     bindPickHandler();
   } catch (error) {
-    statusEl.textContent =
-      "Unable to load Cesium terrain. Check your token and try again.";
+    statusEl.textContent = useToken
+      ? "Unable to load Cesium terrain. Check your token and try again."
+      : "Unable to load the map. Try again or add a token.";
     console.error(error);
   }
 };
@@ -135,40 +142,9 @@ const bindPickHandler = () => {
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 };
 
-const initializeFromStorage = () => {
-  const savedToken = sessionStorage.getItem(TOKEN_STORAGE_KEY);
-  if (savedToken) {
-    tokenInput.value = savedToken;
-    buildViewer(savedToken);
-  } else {
-    statusEl.textContent = "Enter a token to load terrain…";
-  }
+const getTokenFromUrl = () => {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("token") ?? "";
 };
 
-tokenForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const token = tokenInput.value.trim();
-  if (!token) {
-    statusEl.textContent = "Paste a Cesium ion token to continue.";
-    return;
-  }
-
-  sessionStorage.setItem(TOKEN_STORAGE_KEY, token);
-  buildViewer(token);
-});
-
-tokenClear.addEventListener("click", () => {
-  sessionStorage.removeItem(TOKEN_STORAGE_KEY);
-  tokenInput.value = "";
-  statusEl.textContent = "Token cleared. Paste a new token to load terrain.";
-  if (viewer) {
-    viewer.destroy();
-    viewer = undefined;
-  }
-  if (handler) {
-    handler.destroy();
-    handler = undefined;
-  }
-});
-
-initializeFromStorage();
+buildViewer(getTokenFromUrl());

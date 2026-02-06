@@ -16,6 +16,97 @@ body {
   flex-direction: column;
 }
 
+.home-body {
+  background: radial-gradient(circle at top, #ffffff 0%, #eef2f8 45%, #e2e8f4 100%);
+}
+
+.home-shell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+
+.home-card {
+  width: min(100%, 520px);
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 60px rgba(15, 27, 45, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.home-card h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.home-intro {
+  margin: 0;
+  color: #4b5668;
+  line-height: 1.5;
+}
+
+.home-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.home-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2b3442;
+}
+
+.home-input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #d0d8e6;
+  font-size: 0.95rem;
+}
+
+.home-input:focus {
+  outline: 2px solid #f36c3d;
+  outline-offset: 2px;
+}
+
+.home-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.primary-button,
+.ghost-button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 1.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-button {
+  background: #f36c3d;
+  color: #0f1b2d;
+}
+
+.ghost-button {
+  background: #eef2f7;
+  color: #1c2533;
+}
+
+.home-helper {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6a7384;
+}
+
 .app-header {
   display: flex;
   align-items: center;
@@ -49,62 +140,18 @@ body {
   flex-direction: column;
   align-items: flex-end;
   gap: 0.5rem;
-  min-width: min(100%, 420px);
+  min-width: min(100%, 220px);
 }
 
-.token-form {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.35rem 0.75rem;
-  align-items: center;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 0.75rem;
-  border-radius: 12px;
-}
-
-.token-label {
+.text-link {
+  color: #f4b197;
+  text-decoration: none;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #dbe3f2;
 }
 
-.token-input {
-  width: 100%;
-  padding: 0.4rem 0.55rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(15, 27, 45, 0.8);
-  color: #ffffff;
-}
-
-.token-input:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.4);
-  outline-offset: 1px;
-}
-
-.token-button {
-  border: none;
-  border-radius: 999px;
-  padding: 0.35rem 0.85rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: #f36c3d;
-  color: #0f1b2d;
-  cursor: pointer;
-  justify-self: start;
-}
-
-.token-button.ghost {
-  background: rgba(255, 255, 255, 0.2);
-  color: #eef2f7;
-}
-
-.token-helper {
-  grid-column: 1 / -1;
-  margin: 0;
-  font-size: 0.75rem;
-  color: rgba(238, 242, 247, 0.75);
+.text-link:hover {
+  text-decoration: underline;
 }
 
 .app-shell {
@@ -165,11 +212,22 @@ body {
   }
 
   .header-actions {
-    align-items: stretch;
+    align-items: flex-start;
     width: 100%;
   }
 
-  .token-form {
-    grid-template-columns: 1fr;
+  .home-card {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-card {
+    padding: 1.5rem;
+  }
+
+  .home-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

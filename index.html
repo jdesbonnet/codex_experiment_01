@@ -10,47 +10,38 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
-    <header class="app-header">
-      <div>
+  <body class="home-body">
+    <main class="home-shell">
+      <section class="home-card">
         <h1>Observation Explorer</h1>
-        <p>Click a pin to read the related observation article.</p>
-      </div>
-      <div class="header-actions">
-        <form class="token-form" id="tokenForm">
-          <label class="token-label" for="tokenInput">Cesium ion token</label>
+        <p class="home-intro">
+          Add a Cesium ion token to enable high-resolution terrain. It is optional
+          and you can continue without one.
+        </p>
+        <form class="home-form" id="homeTokenForm">
+          <label class="home-label" for="homeTokenInput">
+            Cesium ion token (optional)
+          </label>
           <input
-            id="tokenInput"
-            class="token-input"
+            id="homeTokenInput"
+            class="home-input"
             type="password"
             inputmode="text"
             autocomplete="off"
             placeholder="Paste your token"
-            aria-describedby="tokenHelper"
           />
-          <button type="submit" class="token-button">Use token</button>
-          <button type="button" class="token-button ghost" id="tokenClear">
-            Clear
-          </button>
-          <p class="token-helper" id="tokenHelper">
-            Stored only in this browser session to keep your repo clean.
+          <div class="home-actions">
+            <button type="submit" class="primary-button">Use token</button>
+            <button type="button" class="ghost-button" id="skipToken">
+              Continue without token
+            </button>
+          </div>
+          <p class="home-helper">
+            Tokens stay in the URL for this session and are not stored locally.
           </p>
         </form>
-        <span class="status" id="status">Enter a token to load terrain…</span>
-      </div>
-    </header>
-
-    <main class="app-shell">
-      <section id="cesiumContainer" class="map"></section>
-      <aside class="panel" id="articlePanel" aria-live="polite">
-        <h2 id="articleTitle">Select an observation</h2>
-        <div class="article-body" id="articleBody">
-          <p>Click a pin on the map to preview the observation article.</p>
-        </div>
-      </aside>
+      </section>
     </main>
-
-    <script src="https://unpkg.com/cesium@1.119.0/Build/Cesium/Cesium.js"></script>
-    <script src="app.js"></script>
+    <script src="home.js"></script>
   </body>
 </html>
