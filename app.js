@@ -7,6 +7,8 @@ const panel = document.getElementById("articlePanel");
 
 let viewer;
 let handler;
+let renderStopTimeout;
+let hasScheduledRenderStop = false;
 
 const pinBuilder = new Cesium.PinBuilder();
 const pinImage = pinBuilder
@@ -30,6 +32,11 @@ const buildViewer = async (token) => {
     handler.destroy();
     handler = undefined;
   }
+  if (renderStopTimeout) {
+    window.clearTimeout(renderStopTimeout);
+    renderStopTimeout = undefined;
+  }
+  hasScheduledRenderStop = false;
 
   statusEl.textContent = useToken
     ? "Connecting to Cesium ion…"
@@ -93,11 +100,30 @@ const loadObservationPins = async () => {
     }
   });
 
-  viewer.flyTo(dataSource, {
+  await viewer.flyTo(dataSource, {
     duration: 1.6,
   });
 
+  scheduleRenderStop();
+
   statusEl.textContent = `${entities.length} observations loaded`;
+};
+
+const scheduleRenderStop = () => {
+  if (hasScheduledRenderStop || !viewer) {
+    return;
+  }
+
+  hasScheduledRenderStop = true;
+  renderStopTimeout = window.setTimeout(() => {
+    if (!viewer) {
+      return;
+    }
+
+    viewer.clock.shouldAnimate = false;
+    viewer.scene.requestRenderMode = true;
+    viewer.scene.requestRender();
+  }, 5000);
 };
 
 const bindPickHandler = () => {
