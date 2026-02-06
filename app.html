@@ -18,6 +18,38 @@
       </div>
       <div class="header-actions">
         <span class="status" id="status">Loading map…</span>
+        <div class="tour-controls">
+          <div class="control-group">
+            <label for="tourDuration">Observation time (sec)</label>
+            <input
+              id="tourDuration"
+              class="control-input"
+              type="number"
+              min="3"
+              max="30"
+              step="1"
+              value="8"
+            />
+          </div>
+          <div class="control-group control-buttons">
+            <button class="primary-button" id="startTour">Start tour</button>
+            <button class="ghost-button" id="stopTour" disabled>Stop</button>
+          </div>
+          <div class="control-group control-buttons">
+            <button class="ghost-button" id="startRecording">Record</button>
+            <button class="ghost-button" id="stopRecording" disabled>
+              Stop recording
+            </button>
+            <a
+              class="text-link"
+              id="downloadRecording"
+              href="#"
+              download
+              hidden
+              >Download video</a
+            >
+          </div>
+        </div>
         <a class="text-link" href="index.html">Change token</a>
       </div>
     </header>

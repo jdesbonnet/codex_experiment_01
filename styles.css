@@ -143,6 +143,47 @@ body {
   min-width: min(100%, 220px);
 }
 
+.tour-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: right;
+}
+
+.control-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.control-input {
+  padding: 0.3rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  color: #eef2f7;
+  font-size: 0.85rem;
+}
+
+.control-input:focus {
+  outline: 2px solid #f4b197;
+  outline-offset: 2px;
+}
+
+.control-buttons {
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .text-link {
   color: #f4b197;
   text-decoration: none;
