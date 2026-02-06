@@ -25,7 +25,7 @@ let recordedChunks = [];
 
 const pinBuilder = new Cesium.PinBuilder();
 const pinImage = pinBuilder
-  .fromColor(Cesium.Color.fromCssColorString("#f36c3d"), 48)
+  .fromColor(Cesium.Color.fromCssColorString("#4fbf7a"), 48)
   .toDataURL();
 
 const createImageryProvider = () =>
