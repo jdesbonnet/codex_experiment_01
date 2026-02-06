@@ -24,6 +24,7 @@ body {
   background: #0f1b2d;
   color: #eef2f7;
   gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .app-header h1 {
@@ -41,6 +42,69 @@ body {
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
   font-size: 0.85rem;
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  min-width: min(100%, 420px);
+}
+
+.token-form {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.75rem;
+  border-radius: 12px;
+}
+
+.token-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #dbe3f2;
+}
+
+.token-input {
+  width: 100%;
+  padding: 0.4rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(15, 27, 45, 0.8);
+  color: #ffffff;
+}
+
+.token-input:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 1px;
+}
+
+.token-button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #f36c3d;
+  color: #0f1b2d;
+  cursor: pointer;
+  justify-self: start;
+}
+
+.token-button.ghost {
+  background: rgba(255, 255, 255, 0.2);
+  color: #eef2f7;
+}
+
+.token-helper {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(238, 242, 247, 0.75);
 }
 
 .app-shell {
@@ -98,5 +162,14 @@ body {
   .panel {
     border-left: none;
     border-top: 1px solid #e0e5f0;
+  }
+
+  .header-actions {
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .token-form {
+    grid-template-columns: 1fr;
   }
 }

@@ -16,7 +16,28 @@
         <h1>Observation Explorer</h1>
         <p>Click a pin to read the related observation article.</p>
       </div>
-      <span class="status" id="status">Loading observations…</span>
+      <div class="header-actions">
+        <form class="token-form" id="tokenForm">
+          <label class="token-label" for="tokenInput">Cesium ion token</label>
+          <input
+            id="tokenInput"
+            class="token-input"
+            type="password"
+            inputmode="text"
+            autocomplete="off"
+            placeholder="Paste your token"
+            aria-describedby="tokenHelper"
+          />
+          <button type="submit" class="token-button">Use token</button>
+          <button type="button" class="token-button ghost" id="tokenClear">
+            Clear
+          </button>
+          <p class="token-helper" id="tokenHelper">
+            Stored only in this browser session to keep your repo clean.
+          </p>
+        </form>
+        <span class="status" id="status">Enter a token to load terrain…</span>
+      </div>
     </header>
 
     <main class="app-shell">
