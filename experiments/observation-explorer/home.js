@@ -4,6 +4,7 @@ const homeApiInput = document.getElementById("homeApiInput");
 const homePayloadInput = document.getElementById("homePayloadInput");
 const skipButton = document.getElementById("skipToken");
 const clearButton = document.getElementById("clearSettings");
+const homeSavedStatus = document.getElementById("homeSavedStatus");
 const storageKeys = {
   token: "geoTiffCesiumToken",
   api: "geoTiffCatalogApi",
@@ -61,10 +62,37 @@ const goToApp = () => {
   window.location.assign("app.html");
 };
 
+const updateSavedStatus = () => {
+  if (!homeSavedStatus) {
+    return;
+  }
+
+  const savedFields = [];
+  if (readStoredValue(storageKeys.token)) {
+    savedFields.push("token");
+  }
+  if (readStoredValue(storageKeys.api)) {
+    savedFields.push("API URL");
+  }
+  if (readStoredValue(storageKeys.payload)) {
+    savedFields.push("catalog payload");
+  }
+
+  if (savedFields.length === 0) {
+    homeSavedStatus.textContent = "No saved settings found yet.";
+    return;
+  }
+
+  homeSavedStatus.textContent = `Saved settings loaded for ${savedFields.join(
+    ", "
+  )}.`;
+};
+
 const preloadSettings = () => {
   homeInput.value = readStoredValue(storageKeys.token);
   homeApiInput.value = readStoredValue(storageKeys.api);
   homePayloadInput.value = readStoredValue(storageKeys.payload);
+  updateSavedStatus();
 };
 
 homeForm.addEventListener("submit", (event) => {
@@ -96,6 +124,7 @@ clearButton.addEventListener("click", () => {
   homeInput.value = "";
   homeApiInput.value = "";
   homePayloadInput.value = "";
+  updateSavedStatus();
 });
 
 preloadSettings();
