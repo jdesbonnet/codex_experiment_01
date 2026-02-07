@@ -26,119 +26,42 @@ let selectionSource;
 let timelineEntitiesSource;
 let lastSelectionTime;
 
+const storageKeys = {
+  token: "geoTiffCesiumToken",
+  api: "geoTiffCatalogApi",
+  payload: "geoTiffCatalogPayload",
+};
+
 const createImageryProvider = () =>
   new Cesium.OpenStreetMapImageryProvider({
     url: "https://a.tile.openstreetmap.org/",
   });
 
-const mockProductApi = async () => {
-  const products = [
-    {
-      id: "S2A_2016_05_12",
-      name: "Spring 2016",
-      date: "2016-05-12",
-      cloudCover: 4,
-      url: "https://example.com/cog/sentinel-2/2016-05-12.tif",
-    },
-    {
-      id: "S2A_2017_04_03",
-      name: "Early 2017",
-      date: "2017-04-03",
-      cloudCover: 12,
-      url: "https://example.com/cog/sentinel-2/2017-04-03.tif",
-    },
-    {
-      id: "S2B_2018_07_19",
-      name: "Mid 2018",
-      date: "2018-07-19",
-      cloudCover: 6,
-      url: "https://example.com/cog/sentinel-2/2018-07-19.tif",
-    },
-    {
-      id: "S2B_2019_08_24",
-      name: "Late summer 2019",
-      date: "2019-08-24",
-      cloudCover: 3,
-      url: "https://example.com/cog/sentinel-2/2019-08-24.tif",
-    },
-    {
-      id: "S2A_2020_06_15",
-      name: "Green-up 2020",
-      date: "2020-06-15",
-      cloudCover: 9,
-      url: "https://example.com/cog/sentinel-2/2020-06-15.tif",
-    },
-    {
-      id: "S2A_2021_09_01",
-      name: "Harvest 2021",
-      date: "2021-09-01",
-      cloudCover: 14,
-      url: "https://example.com/cog/sentinel-2/2021-09-01.tif",
-    },
-    {
-      id: "S2B_2022_11_19",
-      name: "Autumn 2022",
-      date: "2022-11-19",
-      cloudCover: 18,
-      url: "https://example.com/cog/sentinel-2/2022-11-19.tif",
-    },
-    {
-      id: "S2B_2023_03_05",
-      name: "Early 2023",
-      date: "2023-03-05",
-      cloudCover: 7,
-      url: "https://example.com/cog/sentinel-2/2023-03-05.tif",
-    },
-    {
-      id: "S2A_2024_06_02",
-      name: "Green-up 2024",
-      date: "2024-06-02",
-      cloudCover: 5,
-      url: "https://example.com/cog/sentinel-2/2024-06-02.tif",
-    },
-    {
-      id: "S2B_2025_02_18",
-      name: "Winter 2025",
-      date: "2025-02-18",
-      cloudCover: 22,
-      url: "https://example.com/cog/sentinel-2/2025-02-18.tif",
-    },
-    {
-      id: "S2B_2026_05_27",
-      name: "Spring 2026",
-      date: "2026-05-27",
-      cloudCover: 8,
-      url: "https://example.com/cog/sentinel-2/2026-05-27.tif",
-    },
-  ];
-
-  return products.map((product) => ({
-    ...product,
-    aoiBounds: DEFAULT_AOI_BOUNDS,
-    dateObj: new Date(`${product.date}T00:00:00Z`),
-  }));
-};
-
 const setStatus = (message) => {
   statusEl.textContent = message;
 };
 
+const readStoredValue = (key) => {
+  try {
+    return localStorage.getItem(key) ?? "";
+  } catch (error) {
+    console.warn("Unable to read stored setting", error);
+    return "";
+  }
+};
+
 const getTokenFromUrl = () => {
   const params = new URLSearchParams(window.location.search);
-  return params.get("token") ?? "";
+  return params.get("token") ?? readStoredValue(storageKeys.token);
 };
 
 const getApiFromUrl = () => {
   const params = new URLSearchParams(window.location.search);
-  return params.get("api") ?? "";
+  return params.get("api") ?? readStoredValue(storageKeys.api);
 };
 
-const getPayloadFromSession = () => {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("payload") !== "1") {
-    return null;
-  }
-  const stored = sessionStorage.getItem("geoTiffCatalogPayload");
+const getPayloadFromStorage = () => {
+  const stored = readStoredValue(storageKeys.payload);
   if (!stored) {
     return null;
   }
@@ -237,6 +160,9 @@ const buildViewer = async (token) => {
   viewer.scene.globe.depthTestAgainstTerrain = true;
   viewer.clock.clockRange = Cesium.ClockRange.CLAMPED;
   viewer.clock.shouldAnimate = false;
+  viewer.scene.screenSpaceCameraController.inertiaSpin = 0;
+  viewer.scene.screenSpaceCameraController.inertiaTranslate = 0;
+  viewer.scene.screenSpaceCameraController.inertiaZoom = 0;
 
   selectionSource = new Cesium.CustomDataSource("active-product");
   timelineEntitiesSource = new Cesium.CustomDataSource("product-timeline");
@@ -590,7 +516,15 @@ const attachUIHandlers = () => {
 
 const initializeProducts = async () => {
   const apiUrl = getApiFromUrl().trim();
-  const payload = getPayloadFromSession();
+  let payload;
+  try {
+    payload = getPayloadFromStorage();
+  } catch (error) {
+    console.error("Stored payload invalid", error);
+    setStatus("Stored payload is invalid. Clear settings to continue.");
+    productCatalog = [];
+  }
+
   if (payload) {
     setStatus("Loading products from pasted payload…");
     productCatalog = payload.map((entry, index) =>
@@ -600,8 +534,8 @@ const initializeProducts = async () => {
     setStatus("Loading products from API…");
     productCatalog = await fetchProductApi(apiUrl);
   } else {
-    setStatus("Loading sample products…");
-    productCatalog = await mockProductApi();
+    setStatus("Add an API endpoint or paste a JSON payload to load products.");
+    productCatalog = [];
   }
   productCatalog.sort((a, b) => a.dateObj - b.dateObj);
 
@@ -618,9 +552,8 @@ const initializeProducts = async () => {
 
   updateProductList();
   createTimelineEntities();
-  updateTimelineRange();
-
   if (productCatalog.length > 0) {
+    updateTimelineRange();
     selectProduct(productCatalog[productCatalog.length - 1], {
       flyTo: true,
       updateClock: true,

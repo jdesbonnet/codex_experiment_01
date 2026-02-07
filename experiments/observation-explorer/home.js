@@ -3,11 +3,37 @@ const homeInput = document.getElementById("homeTokenInput");
 const homeApiInput = document.getElementById("homeApiInput");
 const homePayloadInput = document.getElementById("homePayloadInput");
 const skipButton = document.getElementById("skipToken");
-const payloadStorageKey = "geoTiffCatalogPayload";
+const clearButton = document.getElementById("clearSettings");
+const storageKeys = {
+  token: "geoTiffCesiumToken",
+  api: "geoTiffCatalogApi",
+  payload: "geoTiffCatalogPayload",
+};
+
+const readStoredValue = (key) => {
+  try {
+    return localStorage.getItem(key) ?? "";
+  } catch (error) {
+    console.warn("Unable to read stored setting", error);
+    return "";
+  }
+};
+
+const writeStoredValue = (key, value) => {
+  try {
+    if (!value) {
+      localStorage.removeItem(key);
+      return;
+    }
+    localStorage.setItem(key, value);
+  } catch (error) {
+    console.warn("Unable to store setting", error);
+  }
+};
 
 const persistPayload = (payloadValue) => {
   if (!payloadValue) {
-    sessionStorage.removeItem(payloadStorageKey);
+    writeStoredValue(storageKeys.payload, "");
     return false;
   }
 
@@ -16,7 +42,7 @@ const persistPayload = (payloadValue) => {
     if (!Array.isArray(parsed)) {
       throw new Error("Payload must be a JSON array.");
     }
-    sessionStorage.setItem(payloadStorageKey, JSON.stringify(parsed));
+    writeStoredValue(storageKeys.payload, JSON.stringify(parsed));
     return true;
   } catch (error) {
     window.alert(
@@ -26,21 +52,19 @@ const persistPayload = (payloadValue) => {
   }
 };
 
-const goToApp = (token, apiUrl, hasPayload) => {
-  const params = new URLSearchParams();
-  if (token) {
-    params.set("token", token);
-  }
-  if (apiUrl) {
-    params.set("api", apiUrl);
-  }
-  if (hasPayload) {
-    params.set("payload", "1");
-  }
-  const url = params.toString()
-    ? `app.html?${params.toString()}`
-    : "app.html";
-  window.location.assign(url);
+const storeSettings = (token, apiUrl) => {
+  writeStoredValue(storageKeys.token, token);
+  writeStoredValue(storageKeys.api, apiUrl);
+};
+
+const goToApp = () => {
+  window.location.assign("app.html");
+};
+
+const preloadSettings = () => {
+  homeInput.value = readStoredValue(storageKeys.token);
+  homeApiInput.value = readStoredValue(storageKeys.api);
+  homePayloadInput.value = readStoredValue(storageKeys.payload);
 };
 
 homeForm.addEventListener("submit", (event) => {
@@ -50,7 +74,8 @@ homeForm.addEventListener("submit", (event) => {
   const payloadValue = homePayloadInput.value.trim();
   const hasPayload = persistPayload(payloadValue);
   if (!payloadValue || hasPayload) {
-    goToApp(token, apiUrl, hasPayload);
+    storeSettings(token, apiUrl);
+    goToApp();
   }
 });
 
@@ -59,6 +84,18 @@ skipButton.addEventListener("click", () => {
   const payloadValue = homePayloadInput.value.trim();
   const hasPayload = persistPayload(payloadValue);
   if (!payloadValue || hasPayload) {
-    goToApp("", apiUrl, hasPayload);
+    storeSettings("", apiUrl);
+    goToApp();
   }
 });
+
+clearButton.addEventListener("click", () => {
+  writeStoredValue(storageKeys.token, "");
+  writeStoredValue(storageKeys.api, "");
+  writeStoredValue(storageKeys.payload, "");
+  homeInput.value = "";
+  homeApiInput.value = "";
+  homePayloadInput.value = "";
+});
+
+preloadSettings();
