@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GeoTIFF Catalog API Guide</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="doc-body">
+    <main class="doc-shell">
+      <section class="doc-card">
+        <a href="index.html">← Back to home</a>
+        <h1>GeoTIFF Catalog API Guide</h1>
+        <p>
+          The Sentinel-2 GeoTIFF Timeline Explorer loads catalog entries from a
+          simple JSON API. This guide documents the required payload so that
+          your service (or pasted response) matches the viewer’s expectations.
+        </p>
+
+        <h2>Endpoint</h2>
+        <p>
+          <strong>Method:</strong> <code>GET</code><br />
+          <strong>Content-Type:</strong> <code>application/json</code><br />
+          <strong>Response:</strong> JSON array of catalog entries
+        </p>
+
+        <h2>Request example</h2>
+        <pre><code>GET https://api.example.com/geotiff/catalog
+Accept: application/json</code></pre>
+
+        <h2>Response schema</h2>
+        <p>Each response item represents one GeoTIFF product.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Type</th>
+              <th>Required</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>name</code></td>
+              <td>string</td>
+              <td>No</td>
+              <td>Human-friendly label used in the timeline list.</td>
+            </tr>
+            <tr>
+              <td><code>date</code></td>
+              <td>string (ISO 8601)</td>
+              <td>Yes</td>
+              <td>
+                Acquisition date. Use <code>YYYY-MM-DD</code> or an ISO 8601
+                timestamp such as <code>2024-06-02T00:00:00Z</code>.
+              </td>
+            </tr>
+            <tr>
+              <td><code>cloud</code></td>
+              <td>number</td>
+              <td>No</td>
+              <td>
+                Cloud fraction between <code>0</code> and <code>1</code>. The
+                UI converts this to a percentage.
+              </td>
+            </tr>
+            <tr>
+              <td><code>url</code></td>
+              <td>string (URL)</td>
+              <td>Yes</td>
+              <td>Direct link to the Cloud Optimized GeoTIFF (COG).</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>Response example</h2>
+        <pre><code>[
+  {
+    "name": "Spring 2024",
+    "date": "2024-06-02",
+    "cloud": 0.05,
+    "url": "https://cdn.example.com/cogs/sentinel-2/2024-06-02.tif"
+  },
+  {
+    "name": "Autumn 2024",
+    "date": "2024-10-18",
+    "cloud": 0.18,
+    "url": "https://cdn.example.com/cogs/sentinel-2/2024-10-18.tif"
+  }
+]</code></pre>
+
+        <h2>Best practices</h2>
+        <ul>
+          <li>Return entries sorted by date (ascending) for smoother browsing.</li>
+          <li>
+            Ensure the API sends CORS headers (for example,
+            <code>Access-Control-Allow-Origin: *</code>) so the browser can
+            fetch your catalog.
+          </li>
+          <li>
+            Use HTTPS URLs for GeoTIFF assets to avoid mixed-content issues.
+          </li>
+        </ul>
+
+        <h2>Error handling</h2>
+        <p>
+          Return standard HTTP error codes. The viewer surfaces
+          <code>4xx</code>/<code>5xx</code> responses as load failures.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
