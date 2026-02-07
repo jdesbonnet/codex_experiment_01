@@ -25,6 +25,7 @@ let activeMode = "rgb";
 let selectionSource;
 let timelineEntitiesSource;
 let lastSelectionTime;
+let supportsGeoTiff = true;
 
 const storageKeys = {
   token: "geoTiffCesiumToken",
@@ -39,6 +40,13 @@ const createImageryProvider = () =>
 
 const setStatus = (message) => {
   statusEl.textContent = message;
+};
+
+const setGeoTiffSupportState = (supported) => {
+  supportsGeoTiff = supported;
+  renderModeInputs.forEach((input) => {
+    input.disabled = !supported;
+  });
 };
 
 const readStoredValue = (key) => {
@@ -375,7 +383,7 @@ const createNdviRasterFunction = () => {
 };
 
 const createGeoTiffProvider = async (product) => {
-  if (!Cesium.GeoTIFFImageryProvider?.fromUrl) {
+  if (!supportsGeoTiff || !Cesium.GeoTIFFImageryProvider?.fromUrl) {
     throw new Error("GeoTIFF imagery provider is unavailable in this build.");
   }
 
@@ -399,6 +407,13 @@ const createGeoTiffProvider = async (product) => {
 
 const updateImageryLayer = async () => {
   if (!activeProduct || !viewer) {
+    return;
+  }
+
+  if (!supportsGeoTiff) {
+    setStatus(
+      "GeoTIFF imagery provider is unavailable in this build. Use a Cesium build with GeoTIFF support."
+    );
     return;
   }
 
@@ -565,6 +580,7 @@ const startApp = async () => {
   try {
     setStatus("Connecting to Cesium…");
     await buildViewer(getTokenFromUrl());
+    setGeoTiffSupportState(Boolean(Cesium.GeoTIFFImageryProvider?.fromUrl));
     attachUIHandlers();
     await initializeProducts();
   } catch (error) {
