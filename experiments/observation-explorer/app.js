@@ -133,6 +133,22 @@ const getApiFromUrl = () => {
   return params.get("api") ?? "";
 };
 
+const getPayloadFromSession = () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("payload") !== "1") {
+    return null;
+  }
+  const stored = sessionStorage.getItem("geoTiffCatalogPayload");
+  if (!stored) {
+    return null;
+  }
+  const parsed = JSON.parse(stored);
+  if (!Array.isArray(parsed)) {
+    throw new Error("Stored payload is not an array");
+  }
+  return parsed;
+};
+
 const formatDateLabel = (rawDate) => {
   if (typeof rawDate !== "string") {
     return "";
@@ -574,7 +590,13 @@ const attachUIHandlers = () => {
 
 const initializeProducts = async () => {
   const apiUrl = getApiFromUrl().trim();
-  if (apiUrl) {
+  const payload = getPayloadFromSession();
+  if (payload) {
+    setStatus("Loading products from pasted payload…");
+    productCatalog = payload.map((entry, index) =>
+      buildProductFromApi(entry, index)
+    );
+  } else if (apiUrl) {
     setStatus("Loading products from API…");
     productCatalog = await fetchProductApi(apiUrl);
   } else {
