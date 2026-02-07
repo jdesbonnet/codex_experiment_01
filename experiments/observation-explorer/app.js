@@ -10,6 +10,13 @@ const renderModeInputs = document.querySelectorAll(
   "input[name=renderMode]"
 );
 
+const DEFAULT_AOI_BOUNDS = {
+  west: -122.071,
+  south: 37.364,
+  east: -121.891,
+  north: 37.492,
+};
+
 let viewer;
 let productCatalog = [];
 let activeProduct;
@@ -105,16 +112,9 @@ const mockProductApi = async () => {
     },
   ];
 
-  const aoiBounds = {
-    west: -122.071,
-    south: 37.364,
-    east: -121.891,
-    north: 37.492,
-  };
-
   return products.map((product) => ({
     ...product,
-    aoiBounds,
+    aoiBounds: DEFAULT_AOI_BOUNDS,
     dateObj: new Date(`${product.date}T00:00:00Z`),
   }));
 };
@@ -126,6 +126,64 @@ const setStatus = (message) => {
 const getTokenFromUrl = () => {
   const params = new URLSearchParams(window.location.search);
   return params.get("token") ?? "";
+};
+
+const getApiFromUrl = () => {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("api") ?? "";
+};
+
+const formatDateLabel = (rawDate) => {
+  if (typeof rawDate !== "string") {
+    return "";
+  }
+  return rawDate;
+};
+
+const parseApiDate = (rawDate) => {
+  if (typeof rawDate !== "string") {
+    return null;
+  }
+  const normalized = rawDate.includes("T")
+    ? rawDate
+    : `${rawDate}T00:00:00Z`;
+  const dateObj = new Date(normalized);
+  return Number.isNaN(dateObj.getTime()) ? null : dateObj;
+};
+
+const buildProductFromApi = (entry, index) => {
+  if (!entry.url || typeof entry.url !== "string") {
+    throw new Error(`Missing URL for product entry ${index + 1}`);
+  }
+  const dateObj = parseApiDate(entry.date);
+  if (!dateObj) {
+    throw new Error(`Invalid date for product entry ${index + 1}`);
+  }
+  const cloudValue = Number(entry.cloud);
+  const cloudCover = Number.isFinite(cloudValue)
+    ? Math.round(cloudValue * 100)
+    : 0;
+  return {
+    id: `${entry.name ?? "product"}-${index + 1}`.replace(/\s+/g, "-"),
+    name: entry.name ?? `Product ${index + 1}`,
+    date: formatDateLabel(entry.date),
+    cloudCover,
+    url: entry.url,
+    aoiBounds: DEFAULT_AOI_BOUNDS,
+    dateObj,
+  };
+};
+
+const fetchProductApi = async (apiUrl) => {
+  const response = await fetch(apiUrl, { method: "GET" });
+  if (!response.ok) {
+    throw new Error(`API responded with ${response.status}`);
+  }
+  const payload = await response.json();
+  if (!Array.isArray(payload)) {
+    throw new Error("API response was not an array");
+  }
+  return payload.map((entry, index) => buildProductFromApi(entry, index));
 };
 
 const buildViewer = async (token) => {
@@ -266,6 +324,10 @@ const updateTimelineRange = () => {
 
 const updateProductList = () => {
   productListEl.innerHTML = "";
+  if (productCatalog.length === 0) {
+    productSummaryEl.textContent = "No products available.";
+    return;
+  }
   productSummaryEl.textContent = `${productCatalog.length} products from ${
     productCatalog[0].date
   } to ${productCatalog[productCatalog.length - 1].date}`;
@@ -511,7 +573,14 @@ const attachUIHandlers = () => {
 };
 
 const initializeProducts = async () => {
-  productCatalog = await mockProductApi();
+  const apiUrl = getApiFromUrl().trim();
+  if (apiUrl) {
+    setStatus("Loading products from API…");
+    productCatalog = await fetchProductApi(apiUrl);
+  } else {
+    setStatus("Loading sample products…");
+    productCatalog = await mockProductApi();
+  }
   productCatalog.sort((a, b) => a.dateObj - b.dateObj);
 
   productCatalog = productCatalog.map((product) => ({

@@ -16,7 +16,8 @@
         <h1>Sentinel-2 GeoTIFF Timeline Explorer</h1>
         <p class="home-intro">
           This experiment loads Sentinel-2 COGs and renders RGB or NDVI layers.
-          Add a Cesium ion token to enable high-resolution terrain.
+          Add a Cesium ion token to enable high-resolution terrain and an API
+          endpoint to supply your GeoTIFF catalog.
         </p>
         <form class="home-form" id="homeTokenForm">
           <label class="home-label" for="homeTokenInput">
@@ -30,6 +31,17 @@
             autocomplete="off"
             placeholder="Paste your token"
           />
+          <label class="home-label" for="homeApiInput">
+            GeoTIFF catalog API endpoint (optional)
+          </label>
+          <input
+            id="homeApiInput"
+            class="home-input"
+            type="url"
+            inputmode="url"
+            autocomplete="off"
+            placeholder="https://example.com/catalog"
+          />
           <div class="home-actions">
             <button type="submit" class="primary-button">Use token</button>
             <button type="button" class="ghost-button" id="skipToken">
@@ -37,7 +49,8 @@
             </button>
           </div>
           <p class="home-helper">
-            Tokens stay in the URL for this session and are not stored locally.
+            Token and API settings stay in the URL for this session and are not
+            stored locally.
           </p>
         </form>
       </section>
