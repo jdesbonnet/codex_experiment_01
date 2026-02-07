@@ -135,6 +135,14 @@ body {
   color: #5f7469;
 }
 
+.home-status {
+  padding: 0.65rem 0.9rem;
+  border-radius: 12px;
+  background: var(--spring-tint);
+  border: 1px solid #d7eee0;
+  color: var(--spring-ink);
+}
+
 .doc-body {
   background: radial-gradient(circle at top, #ffffff 0%, #eefcf2 45%, #d9f2e4 100%);
 }
