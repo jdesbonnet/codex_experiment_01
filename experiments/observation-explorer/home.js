@@ -33,6 +33,7 @@ const writeStoredValue = (key, value) => {
 };
 
 const persistPayload = (payloadValue) => {
+  console.log("payloadValue=",payloadValue);
   if (!payloadValue) {
     writeStoredValue(storageKeys.payload, "");
     return false;
